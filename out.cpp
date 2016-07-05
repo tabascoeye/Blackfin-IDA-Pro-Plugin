@@ -55,6 +55,7 @@ void idaapi blackfin_out(void)
 	if(odi.drefmode==DMODE_LOAD_HIGH) 
 	{
 		char name[MAXSTR];
+		qstring qname = qstring();
 
 		
 		size_t len = get_max_ascii_length(odi.daddr, ASCSTR_C, true);
@@ -71,15 +72,15 @@ void idaapi blackfin_out(void)
 
 			get_ascii_contents(odi.daddr, len, ASCSTR_C, string, sizeof(string));
 
-			if(get_colored_long_name(0, odi.daddr, name,60))
-				printf_line(0,"                      -> %s => " COLSTR("\"%s\"",SCOLOR_RPTCMT), name, string);
+			if(get_colored_long_name(&qname, odi.daddr))
+				printf_line(0,"                      -> %s => " COLSTR("\"%s\"",SCOLOR_RPTCMT), qname.c_str(), string);
 			else
 				printf_line(0,"                      -> " COLSTR("0x%lx",SCOLOR_NUMBER) " => " COLSTR("\"%s\"",SCOLOR_RPTCMT) , (unsigned long) odi.daddr,string);
 		}
 		else
 		{
-			if(get_colored_long_name(0, odi.daddr, name,60))
-				printf_line(0,"                      -> %s", name);
+			if(get_colored_long_name(&qname, odi.daddr))
+				printf_line(0,"                      -> %s", qname.c_str());
 			else
 				printf_line(0,"                      -> " COLSTR("0x%lx",SCOLOR_NUMBER), (unsigned long) odi.daddr);
 		}

@@ -145,7 +145,7 @@ loader_t LDSC =
   load_rgl_file,
   NULL,
   NULL,
-  init_loader_options,
+  NULL,
 };
 
 
