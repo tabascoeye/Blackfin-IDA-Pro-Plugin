@@ -33,7 +33,6 @@
 static ldr_hdr _hdr;
 static ldr_hdr blk_hdr;
 static int flg_fin;
-static char buf[0x10000];
 
 //--------------------------------------------------------------------------
 //
@@ -103,25 +102,29 @@ static void idaapi load_ldr_file(linput_t *li, ushort neflags,const char * /*fil
 		if(!read_hdr(li, &blk_hdr)) loader_failure();
 		msg("hdr:: addr=0x%0X, size=0x%0X, flags=0x%0X, args=0x%0x", blk_hdr.target_addr, blk_hdr.size, blk_hdr.block_code, blk_hdr.argument);
 		if (blk_hdr.block_code & BFLAG_FINAL) {
+			msg(" (finish)\n");
 			flg_fin = 1;
 		}
 
 		if ((blk_hdr.block_code & BFLAG_IGNORE) || (blk_hdr.block_code & BFLAG_INIT)) {
+			uchar *buf = (uchar *) malloc(blk_hdr.size);
 			qlread(li, buf, blk_hdr.size);
 			msg(" (ignore)\n");
+			free(buf);
 			continue;
 		}
 
 		if(blk_hdr.block_code & BFLAG_FILL) {
-			msg(" (fill, WARNING not currently respected hopefully they're not trying to be clever)\n");
-			// xxx this crashes. as any good engineer, i just commented it out.
-			//memset(buf,0,blk_hdr.size);
-			//mem2base(buf, blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, -1);
+			msg(" (fill)\n");
+			uchar *buf = (uchar *)malloc(blk_hdr.size);
+			memset(buf, 0, blk_hdr.size);
+			mem2base(buf, blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, -1);
+			free(buf);
 			continue;
 		}
 		msg("\n");
 
-		msg("file2base: 0x%0x-0x%0x (%d bytes)\n", blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, blk_hdr.size);
+		//msg("file2base: 0x%0x-0x%0x (%d bytes)\n", blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, blk_hdr.size);
 		file2base(li, qltell(li), blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, FILEREG_PATCHABLE);
 		
 		if(flg_fin) break;
