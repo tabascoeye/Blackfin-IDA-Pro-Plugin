@@ -26,17 +26,34 @@
 #ifndef __OP1_LDR_H__
 #define __OP1_LDR_H__
 
-struct op1_hdr {
-	uint16  flags;
-	uchar	checksum;
-	uchar   magic;
+/* block flags */
+#define BFLAG_DMACODE_MASK      0x0000000F
+#define BFLAG_DMACODE_SHIFT     0
+#define BFLAG_SAFE              0x00000010
+#define BFLAG_AUX               0x00000020
+#define BFLAG_FILL              0x00000100
+#define BFLAG_QUICKBOOT         0x00000200
+#define BFLAG_CALLBACK          0x00000400
+#define BFLAG_INIT              0x00000800
+#define BFLAG_IGNORE            0x00001000
+#define BFLAG_INDIRECT          0x00002000
+#define BFLAG_FIRST             0x00004000
+#define BFLAG_FINAL             0x00008000
+#define BFLAG_HDRSIGN_MASK      0xFF000000
+#define BFLAG_HDRSIGN_SHIFT     24
+#define BFLAG_HDRSIGN_MAGIC     0xAD
+#define BFLAG_HDRCHK_MASK       0x00FF0000
+#define BFLAG_HDRCHK_SHIFT      16
+
+#define LDR_BLOCK_HEADER_LEN (16)
+struct ldr_hdr {
+	uint32   block_code;
+	uint32   target_addr;
+	uint32   size;
+	uint32   argument;
 };
 
-struct ldr_hdr {
-	uint32   addr;
-	uint32   size;
-	uint16   flags;
-};
+bool read_hdr(linput_t *li, ldr_hdr *hdr);
 
 /*
  *  Bit defitions for ldr_hdr_flags

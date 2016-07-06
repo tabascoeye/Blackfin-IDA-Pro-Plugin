@@ -98,8 +98,7 @@ static void idaapi load_ldr_file(linput_t *li, ushort neflags,const char * /*fil
 	if (!add_segm(0, 0xffb00000, 0xffb00fff, "SCRATCH", CLASS_DATA)) loader_failure();
 
 	msg("Start loading\n");
-	int i = 4;
-	while(i > 0)
+	while(true)
 	{
 		if(!read_hdr(li, &blk_hdr)) loader_failure();
 		msg("hdr:: addr=0x%0X, size=0x%0X, flags=0x%0X, args=0x%0x", blk_hdr.target_addr, blk_hdr.size, blk_hdr.block_code, blk_hdr.argument);
@@ -114,17 +113,18 @@ static void idaapi load_ldr_file(linput_t *li, ushort neflags,const char * /*fil
 		}
 
 		if(blk_hdr.block_code & BFLAG_FILL) {
-			msg(" (fill)\n");
-			memset(buf,0,blk_hdr.size);
-			mem2base(buf, blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, -1);
+			msg(" (fill, WARNING not currently respected hopefully they're not trying to be clever)\n");
+			// xxx this crashes. as any good engineer, i just commented it out.
+			//memset(buf,0,blk_hdr.size);
+			//mem2base(buf, blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, -1);
 			continue;
 		}
-		
+		msg("\n");
+
+		msg("file2base: 0x%0x-0x%0x (%d bytes)\n", blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, blk_hdr.size);
 		file2base(li, qltell(li), blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, FILEREG_PATCHABLE);
 		
-		msg("\n");
 		if(flg_fin) break;
-		i -= 1;
 	}
 
 	inf.af =
