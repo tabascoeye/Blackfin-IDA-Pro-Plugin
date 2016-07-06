@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>rigolldr</ProjectName>
+    <ProjectName>op1ldr</ProjectName>
     <SccProjectName />
     <SccLocalPath />
     <ProjectGuid>{5AE0C851-9333-461B-88F4-3B4DB43117E2}</ProjectGuid>
@@ -82,7 +82,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <OutputFile>Release/rigol_ldr.ldw</OutputFile>
+      <OutputFile>Release/op1_ldr.ldw</OutputFile>
       <ImportLibrary>.\Release\rigol_ldr.lib</ImportLibrary>
       <AdditionalLibraryDirectories>../../libvc.w32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ida.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -90,10 +90,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="rigol_ldr.cpp" />
+    <ClCompile Include="op1_ldr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="rigol_ldr.h" />
+    <ClInclude Include="bf52x.h" />
+    <ClInclude Include="op1_ldr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
