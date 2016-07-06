@@ -29,13 +29,10 @@
 
 #include "../../ldr/idaldr.h"
 #include "op1_ldr.h"
-#include "bf52x.h"
 
-static op1_hdr _hdr;
+static ldr_hdr _hdr;
 static ldr_hdr blk_hdr;
 static int flg_fin;
-unsigned int addr,size;
-unsigned short flags;
 static char buf[0x10000];
 
 //--------------------------------------------------------------------------
@@ -51,28 +48,35 @@ static int idaapi accept_ldr_file(linput_t *li,char fileformatname[MAX_FILE_FORM
 	}
 
 	qlseek(li, 0, SEEK_SET);
-	if (qlread(li, &_hdr, sizeof(_hdr)) != sizeof(_hdr)) {
+	if (!read_hdr(li, &_hdr)) {
+		msg("Couldn't read a full block header.\n");
 		return(0);
 	}
 
-	if (_hdr.magic != BFLAG_HDRSIGN_MAGIC) {
+	if (((_hdr.block_code & BFLAG_HDRSIGN_MASK) >> BFLAG_HDRSIGN_SHIFT) != BFLAG_HDRSIGN_MAGIC) {
+		msg("Magic HDRSIGN byte doesn't match expected value.\n");
 		return(0);
 	}
 
-	qstrncpy(fileformatname, "OP-1 compatible LDR file", MAX_FILE_FORMAT_NAME);
+	qstrncpy(fileformatname, "OP-1 friendly LDR file awwww yeeeah", MAX_FILE_FORMAT_NAME);
 
 	return(1);
 }
 
-int get_hdr(linput_t *li)
+bool read_hdr(linput_t *li, ldr_hdr *hdr)
 {
-	unsigned char tmp[10];
+	unsigned char tmp[LDR_BLOCK_HEADER_LEN];
 
-	if(qlread(li, tmp, 10) != 10) return(0);
-	addr = tmp[0] | tmp[1]<<8 | tmp[2]<<16 | tmp[3]<< 24;
-	size = (tmp[4] | tmp[5]<<8) & 0xFFFF;
-	flags = tmp[8] | tmp[9]<<8;
-	return(1);
+	if (qlread(li, tmp, LDR_BLOCK_HEADER_LEN) != LDR_BLOCK_HEADER_LEN) {
+		return(false);
+	}
+
+	hdr->block_code  = tmp[0]  | tmp[1]  << 8 | tmp[2]  << 16 | tmp[3]  << 24;
+	hdr->target_addr = tmp[4]  | tmp[5]  << 8 | tmp[6]  << 16 | tmp[7]  << 24;
+	hdr->size        = tmp[8]  | tmp[9]  << 8 | tmp[10] << 16 | tmp[11] << 24;
+	hdr->argument    = tmp[12] | tmp[13] << 8 | tmp[14] << 16 | tmp[15] << 24;
+
+	return(true);
 }
 //--------------------------------------------------------------------------
 //
@@ -81,39 +85,46 @@ int get_hdr(linput_t *li)
 static void idaapi load_ldr_file(linput_t *li, ushort neflags,const char * /*fileformatname*/)
 {
 	flg_fin = 0;
-	qlseek(li, 4, SEEK_SET);
+	qlseek(li, 0, SEEK_SET);
 	set_processor_type("Blackfin", SETPROC_ALL|SETPROC_FATAL);
 
 	if (!add_segm(0, 0x00000000, 0x07ffffff, "SDRAM", CLASS_DATA)) loader_failure();
 	if (!add_segm(0, 0xef000000, 0xef007fff, "BOOTROM", CLASS_CODE)) loader_failure();
 	if (!add_segm(0, 0xff800000, 0xff807fff, "DATA1", CLASS_DATA)) loader_failure();
 	if (!add_segm(0, 0xff900000, 0xff907fff, "DATA2", CLASS_DATA)) loader_failure();
-	if (!add_segm(0, 0xffa00000, 0xffa07fff, "INST1", CLASS_DATA)) loader_failure();
-	if (!add_segm(0, 0xffa08000, 0xffa0bfff, "INST2", CLASS_DATA)) loader_failure();
-	if (!add_segm(0, 0xffa10000, 0xffa13fff, "INST3", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xffa00000, 0xffa07fff, "INST1", CLASS_CODE)) loader_failure();
+	if (!add_segm(0, 0xffa08000, 0xffa0bfff, "INST2", CLASS_CODE)) loader_failure();
+	if (!add_segm(0, 0xffa10000, 0xffa13fff, "INST3", CLASS_CODE)) loader_failure();
 	if (!add_segm(0, 0xffb00000, 0xffb00fff, "SCRATCH", CLASS_DATA)) loader_failure();
 
-	/*
-	if(!add_segm(0, 0x0, 0x100000, "SDRAM0", CLASS_CODE)) loader_failure();
-	if(!add_segm(0, 0x19e000, 0x19e400, "SDRAM1", CLASS_CODE)) loader_failure();
-	if(!add_segm(0, 0x608800, 0x700000, "SDRAM2", CLASS_CODE)) loader_failure();
-	if(!add_segm(0, 0xff806000, 0xff808000, "SDRAM3", CLASS_CODE)) loader_failure();
-	if(!add_segm(0, 0xffa08000, 0xffa10000, "SDRAM4", CLASS_CODE)) loader_failure();
-	*/
-
 	msg("Start loading\n");
-
-	while(1)
+	int i = 4;
+	while(i > 0)
 	{
-		if(!get_hdr(li)) loader_failure();
-		msg("hdr:: addr=0x%0X, size=0x%0X, flags=0x%0X\n", addr, size, flags);
-		if(flags & _FINAL) flg_fin = 1;
-		if((flags & _IGNORE) || (flags & _INIT)) { qlread(li, buf, size); continue; }
-		if(flags & _ZEROFILL) {memset(buf,0,size); mem2base(buf, addr, addr + size, -1); continue; }
+		if(!read_hdr(li, &blk_hdr)) loader_failure();
+		msg("hdr:: addr=0x%0X, size=0x%0X, flags=0x%0X, args=0x%0x", blk_hdr.target_addr, blk_hdr.size, blk_hdr.block_code, blk_hdr.argument);
+		if (blk_hdr.block_code & BFLAG_FINAL) {
+			flg_fin = 1;
+		}
+
+		if ((blk_hdr.block_code & BFLAG_IGNORE) || (blk_hdr.block_code & BFLAG_INIT)) {
+			qlread(li, buf, blk_hdr.size);
+			msg(" (ignore)\n");
+			continue;
+		}
+
+		if(blk_hdr.block_code & BFLAG_FILL) {
+			msg(" (fill)\n");
+			memset(buf,0,blk_hdr.size);
+			mem2base(buf, blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, -1);
+			continue;
+		}
 		
-		file2base(li, qltell(li), addr, addr + size, FILEREG_PATCHABLE);
+		file2base(li, qltell(li), blk_hdr.target_addr, blk_hdr.target_addr + blk_hdr.size, FILEREG_PATCHABLE);
 		
+		msg("\n");
 		if(flg_fin) break;
+		i -= 1;
 	}
 
 	inf.af =
