@@ -84,11 +84,22 @@ static void idaapi load_ldr_file(linput_t *li, ushort neflags,const char * /*fil
 	qlseek(li, 4, SEEK_SET);
 	set_processor_type("Blackfin", SETPROC_ALL|SETPROC_FATAL);
 
+	if (!add_segm(0, 0x00000000, 0x07ffffff, "SDRAM", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xef000000, 0xef007fff, "BOOTROM", CLASS_CODE)) loader_failure();
+	if (!add_segm(0, 0xff800000, 0xff807fff, "DATA1", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xff900000, 0xff907fff, "DATA2", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xffa00000, 0xffa07fff, "INST1", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xffa08000, 0xffa0bfff, "INST2", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xffa10000, 0xffa13fff, "INST3", CLASS_DATA)) loader_failure();
+	if (!add_segm(0, 0xffb00000, 0xffb00fff, "SCRATCH", CLASS_DATA)) loader_failure();
+
+	/*
 	if(!add_segm(0, 0x0, 0x100000, "SDRAM0", CLASS_CODE)) loader_failure();
 	if(!add_segm(0, 0x19e000, 0x19e400, "SDRAM1", CLASS_CODE)) loader_failure();
 	if(!add_segm(0, 0x608800, 0x700000, "SDRAM2", CLASS_CODE)) loader_failure();
 	if(!add_segm(0, 0xff806000, 0xff808000, "SDRAM3", CLASS_CODE)) loader_failure();
 	if(!add_segm(0, 0xffa08000, 0xffa10000, "SDRAM4", CLASS_CODE)) loader_failure();
+	*/
 
 	msg("Start loading\n");
 
