@@ -44,6 +44,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>..\..\lib\x86_win_vc_32;$(LibraryPath)</LibraryPath>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

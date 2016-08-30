@@ -96,6 +96,7 @@ void idaapi header(void)
 	printf_line(0,"");
 	printf_line(0,"");
 	printf_line(0,"# Blackfin Processor plugin by Andreas Schuler <andreas@schulerdev.de>");
+	printf_line(0,"# modfied for BF-524 by jakeokay and TabascoEye");
 	printf_line(0,"# ");
 	printf_line(0,"# Based on Simple Python Byte Code Module (Chris Eagle <cseagle@gmail.com>)");
 	printf_line(0,"# Released under GPL v2");

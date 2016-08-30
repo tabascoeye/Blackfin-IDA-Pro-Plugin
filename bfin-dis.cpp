@@ -867,7 +867,10 @@ static int decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, ")");
 	}
 	else
+	{
+		OUTS (outf, "ProgCtrl, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -934,7 +937,10 @@ static int decode_CaCTRL_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, "++]");
 	}
 	else
+	{
+		OUTS(outf, "CaCTRL, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -963,7 +969,10 @@ static int decode_PushPopReg_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, allregs (reg, grp));
 	}
 	else
+	{
+		OUTS(outf, "PushPopReg, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1027,7 +1036,10 @@ static int decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, ") = [SP++]");
 	}
 	else
+	{
+		OUTS(outf, "PushPopMultiple, no match");
 		return 0;
+	}
 	
 	return 2;
 }
@@ -1062,7 +1074,10 @@ static int decode_ccMV_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, gregs (src, s));
 	}
 	else
+	{
+		OUTS(outf, "ccMV, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1257,7 +1272,10 @@ static int decode_CCflag_0 (TIword iw0, disassemble_info *outf)
 	else if (opc == 7 && I == 0 && G == 0 && x == 0 && y == 0)
 		OUTS (outf, "CC = (A0 <= A1)");
 	else
+	{
+		OUTS(outf, "CCflag, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1287,7 +1305,10 @@ static int decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
 	else if (op == 3 && reg == 0)
 		OUTS (outf, "CC = !CC");
 	else
+	{
+		OUTS(outf, "CC2dreg, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1361,7 +1382,10 @@ static int decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, " ^= CC");
 	}
 	else
+	{
+		OUTS(outf, "CC2stat, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1419,7 +1443,10 @@ static int decode_BRCC_0 (TIword iw0, bfd_vma pc, disassemble_info *outf)
 		outf->itype=i_condjump;
 	}
 	else
+	{
+		OUTS(outf, "BRCC, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1484,6 +1511,7 @@ static int decode_REGMV_0 (TIword iw0, disassemble_info *outf)
 
 	/* Still here ?  Invalid reg pair.  */
 invalid_move:
+	OUTS(outf, "REGMV invalid regs");
 	return 0;
 
 valid_move:
@@ -1602,7 +1630,10 @@ static int decode_ALU2op_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, dregs (src));
 	}
 	else
+	{
+		OUTS(outf, "ALU2op, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1670,7 +1701,10 @@ static int decode_PTR2op_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, ") << 0x2");
 	}
 	else
+	{
+		OUTS(outf, "PTR2op, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1762,7 +1796,10 @@ static int decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, uimm5 (src));
 	}
 	else
+	{
+		OUTS(outf, "LOGI2op, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1852,7 +1889,10 @@ static int decode_COMP3op_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, dregs (src1));
 	}
 	else
+	{
+		OUTS(outf, "COMP3op, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1907,7 +1947,10 @@ static int decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
 		comment = 1;
 	}
 	else
+	{
+		OUTS(outf, "COMPI2opD, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -1938,28 +1981,31 @@ static int decode_COMPI2opP_0 (TIword iw0, disassemble_info *outf)
 
 	if (op == 0)
 	{
-		OUTS (outf, pregs (dst));
-		OUTS (outf, " = ");
-		OUTS (outf, imm7 (src));
-		OUTS (outf, " (X);");
-		OUTC (outf, pregs (dst));
-		OUTC (outf, "=");
-		OUTC (outf, uimm32 (*pval));
+		OUTS(outf, pregs(dst));
+		OUTS(outf, " = ");
+		OUTS(outf, imm7(src));
+		OUTS(outf, " (X);");
+		OUTC(outf, pregs(dst));
+		OUTC(outf, "=");
+		OUTC(outf, uimm32(*pval));
 		comment = 1;
 	}
 	else if (op == 1)
 	{
-		OUTS (outf, pregs (dst));
-		OUTS (outf, " += ");
-		OUTS (outf, imm7 (src));
-		OUTS (outf, ";");
-		OUTC (outf, "(");
-		OUTC (outf, imm7d (src));
-		OUTC (outf, ")");
+		OUTS(outf, pregs(dst));
+		OUTS(outf, " += ");
+		OUTS(outf, imm7(src));
+		OUTS(outf, ";");
+		OUTC(outf, "(");
+		OUTC(outf, imm7d(src));
+		OUTC(outf, ")");
 		comment = 1;
 	}
 	else
+	{
+		OUTS(outf, "COMPI2opP, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2101,7 +2147,10 @@ static int decode_LDSTpmod_0 (TIword iw0, disassemble_info *outf)
 		//add_preg_dataref_w(ptr,outf);
 	}
 	else
+	{
+		OUTS(outf, "LDSTpmod, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2137,7 +2186,10 @@ static int decode_dagMODim_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, mregs (m));
 	}
 	else
+	{
+		OUTS(outf, "dagMODim, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2172,7 +2224,10 @@ static int decode_dagMODik_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, " -= 0x4");
 	}
 	else
+	{
+		OUTS(outf, "dagMODik, no match");
 		return 0;
+	}
 
 	if (! parallel)
 	{
@@ -2347,7 +2402,10 @@ static int decode_dspLDST_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, dregs (reg));
 	}
 	else
+	{
+		OUTS(outf, "dspLDST, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2636,7 +2694,10 @@ static int decode_LDST_0 (TIword iw0, disassemble_info *outf)
 		add_preg_dataref_w(ptr,outf);
 	}
 	else
+	{
+		OUTS(outf, "LDST, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2666,7 +2727,10 @@ static int decode_LDSTiiFP_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, dpregs (reg));
 	}
 	else
+	{
+		OUTS(outf, "LDSTiiFP, no match");
 		return 0;
+	}
 
 	return 2; 
 }
@@ -2782,7 +2846,10 @@ static int decode_LDSTii_0 (TIword iw0, disassemble_info *outf)
 		add_preg_dataref_w(ptr+offset,outf);
 	}
 	else
+	{
+		OUTS(outf, "LDSTii, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -2842,7 +2909,10 @@ static int decode_LoopSetup_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_i
 		OUTS (outf, " >> 0x1");
 	}
 	else
+	{
+		OUTS(outf, "LoopSetup, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -2944,7 +3014,10 @@ static int decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 		OUTS (outf, uimm16 (hword));
 	}
 	else
+	{
+		OUTS(outf, "LDIMMhalf, no match");
 		return 0;
+	}
 
 	/* And we print out the 32-bit value if it is a pointer.  */
 	if (S == 0 && Z == 0)
@@ -3015,7 +3088,10 @@ static int decode_CALLa_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info 
 		outf->itype=i_jump;
 	}
 	else
+	{
+		OUTS(outf, "CALLa, no match");
 		return 0;
+	}
 
 	
 
@@ -3158,7 +3234,10 @@ static int decode_LDSTidxI_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 		OUTS (outf, dregs (reg));
 	}
 	else
+	{
+		OUTS(outf, "LDSTidxI, no match");
 		return 0;
+	}
 
 	return 4;
 	}
@@ -3187,7 +3266,10 @@ decode_linkage_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 	else if (R == 1)
 		OUTS (outf, "UNLINK");
 	else
+	{
+		OUTS(outf, "linkage, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -4113,7 +4195,10 @@ static int decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 		OUTS (outf, ")");
 	}
 	else
+	{
+		OUTS(outf, "dsp32alu, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -4540,7 +4625,10 @@ static int decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 		OUTS (outf, ")");
 	}
 	else
+	{
+		OUTS(outf, "dsp32shift, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -4730,7 +4818,10 @@ static int decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *out
 		OUTS (outf, uimm5 (newimmag));
 	}
 	else
+	{
+		OUTS(outf, "dsp32shiftimm, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -4783,7 +4874,10 @@ static int decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
 		OUTS (outf, allregs (reg, grp));
 	}
 	else
+	{
+		OUTS(outf, "pseudoDEBUG, no match");
 		return 0;
+	}
 
 	return 2;
 }
@@ -4853,7 +4947,10 @@ static int decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *
 		OUTS (outf, ")");
 	}
 	else
+	{
+		OUTS(outf, "pseudodgb_assert, no match");
 		return 0;
+	}
 
 	return 4;
 }
@@ -4874,7 +4971,7 @@ static int _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 	{
 		if (parallel)
 		{
-			OUTS (outf, "ILLEGAL");
+			OUTS (outf, "ILLEGAL PARALLEL");
 			SET_FEATURE(outf,CF_STOP);
 			return 0;
 		}
@@ -4882,6 +4979,32 @@ static int _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 		OUTS (outf, "MNOP");
 		return 4;
 	}
+	else if ((iw0 & 0xff80) == 0xe080 && (iw1 & 0x0C00) == 0x0000)
+		rv = decode_LoopSetup_0(iw0, iw1, pc, outf);
+	else if ((iw0 & 0xff00) == 0xe100 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_LDIMMhalf_0(iw0, iw1, outf);
+	else if ((iw0 & 0xfe00) == 0xe200 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_CALLa_0(iw0, iw1, pc, outf);
+	else if ((iw0 & 0xfc00) == 0xe400 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_LDSTidxI_0(iw0, iw1, outf);
+	else if ((iw0 & 0xfffe) == 0xe800 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_linkage_0(iw0, iw1, outf);
+	else if ((iw0 & 0xf600) == 0xc000 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_dsp32mac_0(iw0, iw1, outf);
+	else if ((iw0 & 0xf600) == 0xc200 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_dsp32mult_0(iw0, iw1, outf);
+	else if ((iw0 & 0xf7c0) == 0xc400 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_dsp32alu_0(iw0, iw1, outf);
+	else if ((iw0 & 0xf780) == 0xc600 && (iw1 & 0x01c0) == 0x0000)
+		rv = decode_dsp32shift_0(iw0, iw1, outf);
+	else if ((iw0 & 0xf780) == 0xc680 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_dsp32shiftimm_0(iw0, iw1, outf);
+	else if ((iw0 & 0xff00) == 0xf800)
+		rv = decode_pseudoDEBUG_0(iw0, outf);
+	else if ((iw0 & 0xFF00) == 0xF900)
+		rv = decode_pseudoOChar_0(iw0, outf);
+	else if ((iw0 & 0xFF00) == 0xf000 && (iw1 & 0x0000) == 0x0000)
+		rv = decode_pseudodbg_assert_0(iw0, iw1, outf);
 	else if ((iw0 & 0xff00) == 0x0000)
 		rv = decode_ProgCtrl_0 (iw0, outf);
 	else if ((iw0 & 0xffc0) == 0x0240)
@@ -4930,36 +5053,10 @@ static int _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 		rv = decode_LDSTiiFP_0 (iw0, outf);
 	else if ((iw0 & 0xe000) == 0xA000)
 		rv = decode_LDSTii_0 (iw0, outf);
-	else if ((iw0 & 0xff80) == 0xe080 && (iw1 & 0x0C00) == 0x0000)
-		rv = decode_LoopSetup_0 (iw0, iw1, pc, outf);
-	else if ((iw0 & 0xff00) == 0xe100 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_LDIMMhalf_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xfe00) == 0xe200 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_CALLa_0 (iw0, iw1, pc, outf);
-	else if ((iw0 & 0xfc00) == 0xe400 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_LDSTidxI_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xfffe) == 0xe800 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_linkage_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xf600) == 0xc000 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_dsp32mac_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xf600) == 0xc200 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_dsp32mult_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xf7c0) == 0xc400 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_dsp32alu_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xf780) == 0xc600 && (iw1 & 0x01c0) == 0x0000)
-		rv = decode_dsp32shift_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xf780) == 0xc680 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_dsp32shiftimm_0 (iw0, iw1, outf);
-	else if ((iw0 & 0xff00) == 0xf800)
-		rv = decode_pseudoDEBUG_0 (iw0, outf);
-	else if ((iw0 & 0xFF00) == 0xF900)
-		rv = decode_pseudoOChar_0 (iw0, outf);
-	else if ((iw0 & 0xFF00) == 0xf000 && (iw1 & 0x0000) == 0x0000)
-		rv = decode_pseudodbg_assert_0 (iw0, iw1, outf);
 
 	if (rv == 0)
 	{
-		OUTS (outf, "ILLEGAL");
+		OUTS (outf, "  ...ILLEGAL");
 		SET_FEATURE(outf,CF_STOP);
 	}
 

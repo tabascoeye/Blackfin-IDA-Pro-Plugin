@@ -57,7 +57,7 @@ static int idaapi accept_ldr_file(linput_t *li,char fileformatname[MAX_FILE_FORM
 		return(0);
 	}
 
-	qstrncpy(fileformatname, "OP-1 friendly LDR file awwww yeeeah", MAX_FILE_FORMAT_NAME);
+	qstrncpy(fileformatname, "BlackFin LDR file detected\n", MAX_FILE_FORMAT_NAME);
 
 	return(1);
 }
